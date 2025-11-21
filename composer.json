@@ -1,0 +1,26 @@
+{
+  "name": "ladylxy/jpay-sdk",
+  "description": "A PHP SDK for Jpay payment integration",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "jpay",
+      "email": "service@j-pay.net"
+    }
+  ],
+  "require": {
+    "php": ">=7.4",
+    "ext-curl": "*",
+    "ext-json": "*",
+    "ext-filter": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "Jpay\\PaymentSDK\\": "src/"
+    },
+    "files": [
+      "src/common.php"
+    ]
+  }
+}

@@ -174,7 +174,6 @@ class JpayPaymentSDK
         if ($paymentData['pay_method'] and !empty($paymentData['pay_method'])){
             $payload['pay_method'] = $paymentData['pay_method'];
         }
-        writeLogs("sdkpayment", var_export($payload,true));
         return $this->execute_req($payload, $mid, $secret_key, $gate_url);
 
     }
@@ -270,7 +269,6 @@ class JpayPaymentSDK
             'pay_memberid' => $mid,
             'pay_orderid' => $orderid
         ];
-        writeLogs("query", "payload:".var_export($payload, true));
         return $this->execute_req($payload, $mid, $secret_key, $gate_url, false);
 
     }
@@ -300,12 +298,7 @@ class JpayPaymentSDK
         $inputdata['pay_md5sign'] = $sign_info;
         $header = getHeader();
         $response = vpost($gate_url, $header, $inputdata);
-        writeLogs($ptype, $ptype . " gateway:" . $gate_url);
-        writeLogs($ptype, $ptype . " header:" . var_export($header,true));
-        writeLogs($ptype, $ptype . " inputdata:" . var_export($inputdata,true));
-        writeLogs($ptype, $ptype . " response:" .$response);
         if (!is_array($response)) {
-            writeLogs("refund", " before response:" . $response);
             $response = json_decode($response, true);
         }
 
@@ -357,12 +350,8 @@ class JpayPaymentSDK
         $header = getHeader();
         $response = vpost($gate_url, $header, $payload);
         if (!is_array($response)) {
-            writeLogs($ptype, $ptype . " before response:" . $response);
             $response = json_decode($response, true);
         }
-        writeLogs($ptype, $ptype . " gateway:" . $gate_url);
-        writeLogs($ptype, $ptype . " header:" . var_export($header,true));
-        writeLogs($ptype, $ptype . " response:" . var_export($response,true));
         return $response;
     }
 
@@ -382,7 +371,6 @@ class JpayPaymentSDK
             $input_data = $_POST;
         }
         parse_str($input_data, $data);
-        writeLogs("notify", "notify data".var_export($data,true));
         $sign = $data['sign'];
         unset($data['sign']);
         unset($data['attach']);
@@ -391,7 +379,6 @@ class JpayPaymentSDK
         $secret_key = $this->config['skey'];
         $my_sign = sign($data, $mid, $secret_key, false);
         if ($my_sign != $sign){
-            writeLogs("notify", "invalid sign, my sign:".$my_sign.", sign:".$sign);
             return error_message(self::CODE_FAIL,self::STATUS_FAIL, "Invalid sign");
         }
         return $data;
@@ -411,7 +398,6 @@ class JpayPaymentSDK
         $secret_key = $this->config['skey'];
         $my_sign = sign($data, $mid, $secret_key, false);
         if ($my_sign != $sign){
-            writeLogs("refund_notify", "invalid sign, my sign:".$my_sign.", sign:".$sign);
             return error_message(self::CODE_FAIL,self::STATUS_FAIL, "Invalid sign");
         }
         return $data;
@@ -506,13 +492,10 @@ class JpayPaymentSDK
         $sign_data = sign($payload,$mid,$secret_key,false);
         $payload['sign'] = $sign_data;
         $header = getHeader();
-        writeLogs("payout", "payout info:".var_export($payload,true));
         $res = vpost($gate_url, $header, $payload);
         if (!is_array($res)){
-            writeLogs("payout", "payout res:".$res);
             $res = json_decode($res,true);
         }
-        writeLogs("payout", "payout res:".json_encode($res));
         return $res;
     }
 
@@ -526,6 +509,8 @@ class JpayPaymentSDK
         }
         if (!$is_debug){
             $gate_url = $this->config['query_payout_url'];
+            $mid = $this->config['mid'];
+            $secret_key = $this->config['skey'];
         }
 
         $payload = [
@@ -541,7 +526,6 @@ class JpayPaymentSDK
         if (!is_array($res)){
             $res = json_decode($res,true);
         }
-        writeLogs("payout", "payout res:".json_encode($res));
         return $res;
     }
 

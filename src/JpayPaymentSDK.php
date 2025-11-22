@@ -24,7 +24,7 @@ class JpayPaymentSDK
 
     const ENTITY = "entity";
 
-    const PAYOUT = "payout";
+    const SUBSCRIBE = "subscribe";
 
 
 
@@ -107,7 +107,10 @@ class JpayPaymentSDK
             $check_res = checkRequiredFieldsWithMissing($paymentData, $this->virtualRequireKey);
         }elseif ($ptype == self::ENTITY){
             $check_res = checkRequiredFieldsWithMissing($paymentData, $this->entityRequireKey);
-        }else{
+        }elseif($ptype == self::SUBSCRIBE){
+            $check_res = checkRequiredFieldsWithMissing($paymentData, $this->subRequireKey);
+        }
+        else{
             return error_message(self::CODE_FAIL,self::STATUS_FAIL, "ptype parameters is error");
         }
 
@@ -145,6 +148,16 @@ class JpayPaymentSDK
         ];
         if ($ptype == self::APM){
             $payload['pay_type'] = 'apm';
+        }
+        if ($ptype == self::SUBSCRIBE){
+            $payload['pay_cardno'] = $paymentData['pay_cardno'];
+            $payload['pay_cardmonth'] = $paymentData['pay_cardmonth'];
+            $payload['pay_cardyear'] = $paymentData['pay_cardyear'];
+            $payload['pay_cardcvv'] = $paymentData['pay_cardcvv'];
+            $payload['pay_productname'] = $paymentData['pay_productname'];
+        }
+        if ($paymentData['subscription_plan'] and !empty($paymentData['subscription_plan'])){
+            $payload['subscription_plan'] = $paymentData['subscription_plan'];
         }
         if ($ptype == self::ENTITY){
             $payload['pay_street_address1'] = $paymentData['pay_street_address1'];
